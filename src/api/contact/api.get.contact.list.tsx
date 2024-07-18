@@ -1,8 +1,6 @@
 'use server';
 
-import { cookies } from 'next/headers';
 import axios from 'axios';
-
 import logger from '@utils/logger';
 import { ENDPOINTS } from './endpoints';
 import { Rq_headers } from './common.headers';
@@ -10,7 +8,7 @@ import { CommonError } from './common.http';
 
 const identity = '[api/contact.list]';
 
-export interface IRq_GetContactList { }
+export interface IRq_GetContactList { id: string, }
 
 export type T_Contact = {
     id: string,
@@ -25,7 +23,6 @@ export interface IRs_GetContactList {
 }
 
 export async function API_GetContactList() {
-    const token = cookies().get('token');
     try {
         const response = await axios({
             method: 'get',
@@ -33,7 +30,6 @@ export async function API_GetContactList() {
             url: ENDPOINTS.contact.list,
             headers: {
                 ...Rq_headers,
-                'x-api-key': token?.value,
             },
         });
 

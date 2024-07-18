@@ -1,8 +1,6 @@
 'use server';
 
-import { cookies } from 'next/headers';
 import axios from 'axios';
-
 import logger from '@utils/logger';
 import { ENDPOINTS } from './endpoints';
 import { Rq_headers } from './common.headers';
@@ -26,8 +24,6 @@ export interface IRs_DeleteContact {
 }
 
 export async function API_DeleteContact(data: IRq_DeleteContact) {
-    const token = cookies().get('token');
-
     try {
         const response = await axios({
             method: 'post',
@@ -35,7 +31,6 @@ export async function API_DeleteContact(data: IRq_DeleteContact) {
             url: ENDPOINTS.contact.delete,
             headers: {
                 ...Rq_headers,
-                'x-api-key': token?.value,
             },
             data: data,
         });

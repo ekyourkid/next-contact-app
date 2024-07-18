@@ -5,13 +5,15 @@ import { ACT_GetContactList } from "./contact/$actions/action.get.list.contact";
 import { IRs_GetContactList } from "@/api/contact/api.get.contact.list";
 
 export default async function Home() {
-  const data = await ACT_GetContactList()
+    const data = await ACT_GetContactList();
 
-  return (
-    <main className="min-h-screen w-full bg-[#F4F6F8]">
-      <CE_ContactHeader />
-      <CE_NewContact data={data as IRs_GetContactList} />
-      <CE_ContactList data={data as IRs_GetContactList} />
-    </main>
-  );
+    const totalData = data?.data?.length || 0;
+
+    return (
+        <main className="min-h-screen w-full bg-[#F4F6F8]">
+            <CE_ContactHeader totalData={totalData} />
+            <CE_NewContact data={data as IRs_GetContactList} />
+            <CE_ContactList data={data as IRs_GetContactList} />
+        </main>
+    );
 }

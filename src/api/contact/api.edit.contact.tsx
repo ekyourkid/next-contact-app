@@ -1,50 +1,37 @@
 'use server';
 
-import { cookies } from 'next/headers';
 import axios from 'axios';
-
 import logger from '@utils/logger';
 import { ENDPOINTS } from './endpoints';
 import { Rq_headers } from './common.headers';
-import { CommonError } from './common.http';
+import { revalidatePath } from 'next/cache';
 
 const identity = '[api/contact.edit]';
-
 export interface IRq_PutContact {
-    repayment: {
-        userId: string;
-        isRetry: boolean;
-        scheme: string;
-    };
+    firstName: string
+    lastName: string
+    age: number
+    photo: string
 }
 
 export interface IRs_PutContact {
-    code: number;
-    responseCode: string;
-    responseDesc: string;
-    responseData?: any;
+    message: string;
 }
 
-export async function API_PutContact(data: IRq_PutContact) {
-    const token = cookies().get('token');
-
+export async function API_PutContact(id: string, data: IRq_PutContact) {
     try {
         const response = await axios({
-            method: 'post',
-            maxBodyLength: Infinity,
-            url: ENDPOINTS.contact.update,
+            method: 'PUT',
+            url: ENDPOINTS.contact.update + `/${id}`,
             headers: {
                 ...Rq_headers,
-                'x-api-key': token?.value,
             },
             data: data,
         });
 
+        revalidatePath(`/contact/edit/${id}`, 'page')
         const result: IRs_PutContact = response.data;
         logger.info(identity, result);
-
-        if (typeof result.responseData === 'undefined') return CommonError;
-        if (result.responseData === null) return CommonError;
 
         return result;
     } catch (error: any) {

@@ -1,33 +1,25 @@
 'use server';
 
-import { cookies } from 'next/headers';
 import axios from 'axios';
-
 import logger from '@utils/logger';
 import { ENDPOINTS } from './endpoints';
 import { Rq_headers } from './common.headers';
-import { CommonError } from './common.http';
+import { revalidatePath } from 'next/cache';
 
 const identity = '[api/contact.create]';
 
 export interface IRq_PostCreateContact {
-    repayment: {
-        userId: string;
-        isRetry: boolean;
-        scheme: string;
-    };
+    firstName: string
+    lastName: string
+    age: number
+    photo: string
 }
 
 export interface IRs_IRq_PostCreateContact {
-    code: number;
-    responseCode: string;
-    responseDesc: string;
-    responseData?: any;
+    message: string;
 }
 
 export async function API_IRq_PostCreateContact(data: IRq_PostCreateContact) {
-    const token = cookies().get('token');
-
     try {
         const response = await axios({
             method: 'post',
@@ -35,16 +27,13 @@ export async function API_IRq_PostCreateContact(data: IRq_PostCreateContact) {
             url: ENDPOINTS.contact.create,
             headers: {
                 ...Rq_headers,
-                'x-api-key': token?.value,
             },
             data: data,
         });
+        revalidatePath('/')
 
         const result: IRs_IRq_PostCreateContact = response.data;
         logger.info(identity, result);
-
-        if (typeof result.responseData === 'undefined') return CommonError;
-        if (result.responseData === null) return CommonError;
 
         return result;
     } catch (error: any) {
